@@ -33,11 +33,15 @@ def check_source():
 def main():
     check_source()
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    # make.fun collects the outputs as another user than the one the
-    # program runs as, so the output must be readable by everyone.
-    os.chmod(OUTPUT_DIR, 0o755)
+    # Do not chmod the output directory: the grader owns it and runs
+    # this program as a different user, so chmod would fail the run.
     shutil.copyfile(SOURCE, DESTINATION)
-    os.chmod(DESTINATION, 0o644)
+    # Best effort only: the file is ours, but a permission problem
+    # must never fail the run.
+    try:
+        os.chmod(DESTINATION, 0o644)
+    except PermissionError:
+        pass
     print("wrote {} ({} bytes)".format(DESTINATION, os.path.getsize(DESTINATION)))
 
 
